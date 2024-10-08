@@ -34,8 +34,8 @@ def get_secret_value(region_name, secret_name, key_name=None):
 
         response = secret_manager.get_secret_value(SecretId=secret_name)
     except Exception as e:
-        logger.exception(f"Retrieval of secret {secret_name} failed. An Unknown {type(e).__name} has occurred.\n{str(e)}")
-        return f"Retrieval of secret {secret_name} failed. An Unknown {type(e).__name} has occurred.", 500
+        logger.exception(f"Retrieval of secret {secret_name} failed.  Endpoint connection error occurred.\n{str(e)}")
+        return f"Retrieval of secret {secret_name} failed. Endpoint connection error occurred.", 500
 
     secret_str = response.get("SecretString", "")
 

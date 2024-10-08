@@ -11,10 +11,8 @@ from bot_functions import get_secret_value
 
 app = flask.Flask(__name__)
 
-# from the dockerfile
-REGION_NAME = os.environ['REGION_NAME'] # new from terraform
-DYNAMODB_TABLE = os.environ['DYNAMODB_TABLE'] # new from terraform
-# SECRET_ID = os.environ['SECRET_ID'] # new from terraform
+REGION_NAME = os.environ['REGION_NAME']
+DYNAMODB_TABLE = os.environ['DYNAMODB_TABLE']
 TELEGRAM_APP_URL = os.getenv('TELEGRAM_APP_URL')
 print(f"telegram app url: {TELEGRAM_APP_URL}")
 TELEGRAM_TOKEN_NAME = os.environ['TELEGRAM_TOKEN_NAME']
