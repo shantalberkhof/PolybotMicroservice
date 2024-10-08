@@ -11,7 +11,8 @@ from telebot.apihelper import ApiTelegramException
 # from app import REGION_NAME  # Import REGION_NAME from app.py
 import concurrent.futures
 REGION_NAME = os.environ['REGION_NAME']  # Access the environment variable directly in bot.py
-bucket_name = 'tf-shantalberkhof-images-bucket-us-east-1'
+BUCKET_NAME = os.environ['BUCKET_NAME']
+TELEGRAM_APP_URL = os.environ['TELEGRAM_APP_URL']
 
 class Bot:
 
@@ -177,7 +178,7 @@ class ObjectDetectionBot(Bot):
                 # Upload to S3 here for each iteration
                 object_key = f'data/Image_number_{i + 1}_{file_name}'  # name and the path (key) to store the image on s3
                 try:
-                    self.s3_client.upload_file(path, bucket_name, object_key)
+                    self.s3_client.upload_file(path, BUCKET_NAME, object_key)
                     logger.info(f'{file_name} {i + 1}/{count} was uploaded to S3 successfully')
                 except Exception as e:
                     logger.error(f'Failed to upload {file_name} to S3: {e}')
@@ -192,7 +193,7 @@ class ObjectDetectionBot(Bot):
             queue_url = 'https://sqs.us-east-1.amazonaws.com/019273956931/tf-shantalberkhof-project-queue'
             chat_id = msg['chat']['id']
             message_body = {
-                'bucket_name': bucket_name,
+                'bucket_name': BUCKET_NAME,
                 'object_key': object_key,
                 'file_name': file_name,
                 'chat_id': msg['chat']['id']  # Added chat_id to the message body

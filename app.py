@@ -7,7 +7,7 @@ from bot import Bot
 from bot import ObjectDetectionBot
 import logging
 import json
-from bot_functions import get_secret, load_telegram_token
+from bot_functions import get_secret_value
 
 app = flask.Flask(__name__)
 
@@ -17,6 +17,7 @@ DYNAMODB_TABLE = os.environ['DYNAMODB_TABLE'] # new from terraform
 # SECRET_ID = os.environ['SECRET_ID'] # new from terraform
 TELEGRAM_APP_URL = os.getenv('TELEGRAM_APP_URL')
 print(f"telegram app url: {TELEGRAM_APP_URL}")
+TELEGRAM_TOKEN_NAME = os.environ['TELEGRAM_TOKEN_NAME']
 
 # Initialize DynamoDB client
 dynamodb = boto3.resource('dynamodb', region_name=REGION_NAME)
@@ -36,7 +37,7 @@ logger = logging.getLogger()
 #secretsmanager = boto3.client('secretsmanager', region_name=REGION_NAME)
 #response = secretsmanager.get_secret_value(SecretId=SECRET_ID)
 #secret = response['SecretString']
-TELEGRAM_TOKEN = load_telegram_token()
+TELEGRAM_TOKEN = get_secret_value(REGION_NAME, TELEGRAM_TOKEN_NAME)
 if TELEGRAM_TOKEN:
     print(f"TELEGRAM_TOKEN: {TELEGRAM_TOKEN}")
     bot = ObjectDetectionBot(TELEGRAM_TOKEN, TELEGRAM_APP_URL)
