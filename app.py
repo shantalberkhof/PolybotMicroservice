@@ -16,11 +16,11 @@ DYNAMODB_TABLE = os.environ['DYNAMODB_TABLE']
 TELEGRAM_APP_URL = os.getenv('TELEGRAM_APP_URL')
 print(f"telegram app url: {TELEGRAM_APP_URL}")
 TELEGRAM_TOKEN_NAME = os.environ['TELEGRAM_TOKEN_NAME']
+print(f"telegram token: {TELEGRAM_TOKEN_NAME}")
 
 # Initialize DynamoDB client
 dynamodb = boto3.resource('dynamodb', region_name=REGION_NAME)
 table = dynamodb.Table(DYNAMODB_TABLE)
-# table = dynamodb.Table('shantal-dynamoDB-aws')
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger()

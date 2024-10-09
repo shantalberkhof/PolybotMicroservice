@@ -28,7 +28,7 @@ def get_secret(secret_name, region_name):
     return secret
 
 
-def get_secret_value(region_name, secret_name, key_name=None):
+def get_secret_value(region_name, secret_name):
     try:
         secret_manager = boto3.client('secretsmanager', region_name)
 
@@ -43,17 +43,13 @@ def get_secret_value(region_name, secret_name, key_name=None):
         logger.exception(f"Retrieval of secret {secret_name} failed. Secret value is empty")
         return f"Retrieval of secret {secret_name} failed. Secret value is empty", 500
 
-    if key_name:
-        # Parse the JSON string to get the actual values
-        secret_dict = json.loads(secret_str)
-
-        # Access the specific value you need
-        secret_value = secret_dict[key_name]
-    else:
-        secret_value = secret_str
+    # Ensure the secret is a string (just in case)
+    if not isinstance(secret_str, str):
+        logger.error(f"Secret value for {secret_name} is not a string: {secret_str}")
+        return f"Secret value for {secret_name} is not a string.", 500
 
     logger.info(f"Fetching secret: {secret_name}, succeeded.")
-    return secret_value, 200
+    return secret_str
 
 
 def load_telegram_token():

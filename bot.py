@@ -13,6 +13,7 @@ import concurrent.futures
 REGION_NAME = os.environ['REGION_NAME']  # Access the environment variable directly in bot.py
 BUCKET_NAME = os.environ['BUCKET_NAME']
 TELEGRAM_APP_URL = os.environ['TELEGRAM_APP_URL']
+SQS_QUEUE_NAME= os.environ['SQS_QUEUE_NAME']
 
 class Bot:
 
@@ -190,7 +191,7 @@ class ObjectDetectionBot(Bot):
             # TODO send a job to the SQS queue
             # The job message contains information regarding the image to be processed, as well as the Telegram chat_id
             #queue_url = 'https://sqs.us-east-2.amazonaws.com/019273956931/shantal-queue-aws'
-            queue_url = 'https://sqs.us-east-1.amazonaws.com/019273956931/tf-shantalberkhof-project-queue'
+            queue_url = SQS_QUEUE_NAME
             chat_id = msg['chat']['id']
             message_body = {
                 'bucket_name': BUCKET_NAME,
