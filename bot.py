@@ -17,7 +17,7 @@ SQS_QUEUE_NAME= os.environ['SQS_QUEUE_NAME']
 
 class Bot:
 
-    def __init__(self, token, telegram_chat_url): # passed before publickey too.
+    def __init__(self, token, telegram_chat_url, publickey): # passed before publickey too.
         # create a new instance of the TeleBot class.
         # all communication with Telegram servers are done using self.telegram_bot_client
         self.telegram_bot_client = telebot.TeleBot(token)
@@ -27,44 +27,43 @@ class Bot:
         retries = 4
         retry_delay = 1  # initial delay in seconds
 
-        for attempt in range(retries):
+        # for attempt in range(retries):
+        #     try:
+        #         # sets the webhook URL
+        #         self.telegram_bot_client.set_webhook(url=f'{telegram_chat_url}/{token}/', timeout=60) # option 2 - cert manager
+        #         logger.info(f'Telegram Bot information\n\n{self.telegram_bot_client.get_me()}')
+        #         break
+        #     except ApiTelegramException as e:
+        #         if e.error_code == 429:
+        #             retry_after = int(e.result_json.get('parameters', {}).get('retry_after', retry_delay))
+        #             logger.warning(f'Too Many Requests. Retrying after {retry_after} seconds...')
+        #             time.sleep(retry_after)
+        #             retry_delay *= 2  # Exponential backoff
+        #         else:
+        #             logger.error(f"Failed to set webhook: {e}")
+        #             raise e  # Re-raise the exception for non-429 errors
+        # else:
+        #     logger.error("Failed to set webhook after retries")
+
+
+        retries = 4
+        for _ in range(retries):
             try:
-                # sets the webhook URL
-                self.telegram_bot_client.set_webhook(url=f'{telegram_chat_url}/{token}/', timeout=60) # option 2 - cert manager
-                logger.info(f'Telegram Bot information\n\n{self.telegram_bot_client.get_me()}')
-                break
-            except ApiTelegramException as e:
-                if e.error_code == 429:
-                    retry_after = int(e.result_json.get('parameters', {}).get('retry_after', retry_delay))
+                self.telegram_bot_client.set_webhook(url=f'{telegram_chat_url}:443/{token}/', certificate=publickey,
+                                                     timeout=60)
+                logger.info(f'Telegram Bot Information\n{self.telegram_bot_client.get_me()}')
+                break  # Break out of the retry loop if successful
+            except telebot.apihelper.ApiTelegramException as e:
+                if e.error_code == 429:  # Too Many Requests error
+                    retry_after = int(e.result_json.get('parameters', {}).get('retry_after', 1))
                     logger.warning(f'Too Many Requests. Retrying after {retry_after} seconds...')
                     time.sleep(retry_after)
-                    retry_delay *= 2  # Exponential backoff
+                    continue
                 else:
                     logger.error(f"Failed to set webhook: {e}")
-                    raise e  # Re-raise the exception for non-429 errors
+                    raise e  # Re-raise the exception if it's not a 429 error
         else:
             logger.error("Failed to set webhook after retries")
-
-
-        # if token == '6889860814:AAGJU6KNTn0rmNx17XiI49IenE_642rvAnQ':
-        #     retries = 4
-        #     for _ in range(retries):
-        #         try:
-        #             self.telegram_bot_client.set_webhook(url=f'{telegram_chat_url}:443/{token}/', certificate=publickey,
-        #                                                  timeout=60)
-        #             logger.info(f'Telegram Bot Information\n{self.telegram_bot_client.get_me()}')
-        #             break  # Break out of the retry loop if successful
-        #         except telebot.apihelper.ApiTelegramException as e:
-        #             if e.error_code == 429:  # Too Many Requests error
-        #                 retry_after = int(e.result_json.get('parameters', {}).get('retry_after', 1))
-        #                 logger.warning(f'Too Many Requests. Retrying after {retry_after} seconds...')
-        #                 time.sleep(retry_after)
-        #                 continue
-        #             else:
-        #                 logger.error(f"Failed to set webhook: {e}")
-        #                 raise e  # Re-raise the exception if it's not a 429 error
-        #     else:
-        #         logger.error("Failed to set webhook after retries")
 
 
 
@@ -118,8 +117,8 @@ class Bot:
 
 
 class ObjectDetectionBot(Bot):
-    def __init__(self, token, url):
-        super().__init__(token, url)
+    def __init__(self, token, url, publickey):
+        super().__init__(token, url, publickey)
         self.s3_client = boto3.client('s3', region_name=REGION_NAME)
         self.sqs_client = boto3.client('sqs', region_name=REGION_NAME)
         self.in_hdl_mes = 0

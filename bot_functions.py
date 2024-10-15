@@ -8,6 +8,7 @@ import json
 REGION_NAME = os.environ['REGION_NAME'] # new from terraform
 
 
+# older func
 def get_secret(secret_name, region_name):
 
     # Create a Secrets Manager client
@@ -57,7 +58,7 @@ def load_telegram_token():
     # region_name = 'us-east-2'
     #region_name=REGION_NAME
     secret_name = 'tf-telegram-botToken-us-east-1'
-    secrets = get_secret(secret_name, REGION_NAME)
+    secrets = get_secret_value(secret_name, REGION_NAME)
     if secrets is None:
         logger.error("Unable to retrieve secrets. Exiting.")
         return None
