@@ -37,7 +37,7 @@ print(f"Retrieved Public Key Value: {PUBLIC_KEY}")
 TELEGRAM_TOKEN = get_secret_value(REGION_NAME, TELEGRAM_TOKEN_NAME)
 if TELEGRAM_TOKEN:
     print(f"TELEGRAM_TOKEN: {TELEGRAM_TOKEN}")
-    bot = ObjectDetectionBot(TELEGRAM_TOKEN, TELEGRAM_APP_URL)
+    bot = ObjectDetectionBot(TELEGRAM_TOKEN, TELEGRAM_APP_URL, PUBLIC_KEY)
 
 
 # way 2
