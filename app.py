@@ -64,7 +64,8 @@ def webhook():
     return 'Ok'
 
 
-@app.route(f'/results', methods=['GET'])
+# @app.route(f'/results', methods=['GET'])
+@app.route(f'/results', methods=['POST'])
 def results():
     prediction_id = request.args.get('predictionId')
     if not prediction_id:
