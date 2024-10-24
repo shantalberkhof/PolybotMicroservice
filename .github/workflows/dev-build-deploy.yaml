@@ -1,7 +1,7 @@
 name: Dev Build and Deploy to ArgoCD
 
 on:
-  push:
+  push: # REGULAR
     branches:
       - dev
 
@@ -21,6 +21,7 @@ jobs:
         docker build -t $IMAGE_NAME .
         docker push $IMAGE_NAME
 
-    - name: Deploy to Dev using ArgoCD
-      run: |
-        argocd app sync polybot-dev --prune --force
+
+#    - name: Deploy to Dev using ArgoCD
+#      run: |
+#        argocd app sync polybot-dev --prune --force
