@@ -1,0 +1,61 @@
+
+name: Prod Build, Test, and Deploy
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Build and push Docker image
+        run: |
+          cd microservice
+          docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_PASSWORD }}
+          IMAGE_NAME=${{ secrets.DOCKERHUB_USERNAME }}/my_yolo5_k8s:v2
+          docker build -t $IMAGE_NAME .
+          docker push $IMAGE_NAME
+
+  test:
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Run tests
+        run: |
+          cd microservice
+          # Example: Running tests using pytest
+          pytest tests/ --maxfail=1 --disable-warnings -q
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: test
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Update K8s Prod deployment file with new image
+        run: |
+          # Update the prod deployment file with the new image tag
+          sed -i 's|image:.*|image: $IMAGE_NAME|' k8s/prod-deployment.yaml
+
+      - name: Commit updated k8s deployment
+        run: |
+          git config --global user.name "Your Name"
+          git config --global user.email "your-email@example.com"
+          git add k8s/prod-deployment.yaml
+          git commit -m "Update prod deployment with new Docker image"
+          git push origin main
