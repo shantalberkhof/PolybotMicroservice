@@ -21,6 +21,3 @@ jobs:
         docker build -t $IMAGE_NAME .
         docker push $IMAGE_NAME
 
-    - name: Deploy to Dev using ArgoCD
-      run: |
-        argocd app sync polybot-dev --prune --force
